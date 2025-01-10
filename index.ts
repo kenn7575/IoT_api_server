@@ -11,7 +11,7 @@ app.get("/", (req: Request, res: Response) => {
   res.send("connection successful");
 });
 app.get("/test", (req: Request, res: Response) => {
-  res.send("im the 2nd version");
+  res.send("im the 9nd version");
 });
 
 app.listen(port, () => {

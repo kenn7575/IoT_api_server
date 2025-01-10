@@ -81,7 +81,7 @@
 
 # Configuration
 SERVER="kenn7575@192.168.1.50" # Replace with your server's SSH user and hostname
-BLUE_PORT=3000
+BLUE_PORT=3002
 GREEN_PORT=3001
 IMAGE_NAME="express-app:new" # Name of the Docker image to create and deploy
 LOCAL_BUILD_DIR="." # Directory containing the Dockerfile (e.g., current directory)
@@ -130,30 +130,29 @@ if [ $? -ne 0 ]; then
 fi
 
 # step 5.5: Sleep for 5 seconds to allow the container to start
-sleep 5
+sleep 2
 
 # Step 6: Test the new environment
 echo "Testing the new environment on port $NEW_PORT..."
-TEST_RESULT2=$(ssh $SERVER "curl -s http://127.0.0.1:3001")
-TEST_RESULT1=$(ssh $SERVER "curl -s http://127.0.0.1:3000")
-TEST_RESULT=$(ssh $SERVER "curl -s http://127.0.0.1:$NEW_PORT")
+for i in {1..10}; do
+  TEST_RESULT=$(ssh $SERVER "curl -s http://127.0.0.1:$NEW_PORT")
+  if echo "$TEST_RESULT" | grep -q 'connection successful'; then
+    echo "New container is ready."
+    break
+  fi
+  echo "Retrying in 2 seconds..."
+  sleep 2
+done
 
-echo "Test result for port 3000: $TEST_RESULT1"
-echo "Test result for port 3001: $TEST_RESULT2"
-
-
-if echo "$TEST_RESULT" | grep -q 'connection successful'; then
-  echo "Test result: $TEST_RESULT"
-  echo "New environment is healthy. Switching traffic."
-else
-  echo "Test result: $TEST_RESULT"
-  echo "Health check failed! Cleaning up the new container."
+# If the container is still not healthy, exit
+if ! echo "$TEST_RESULT" | grep -q 'connection successful'; then
+  echo "New container failed to start within the timeout. Cleaning up..."
   ssh $SERVER "docker stop express-app-$NEW_COLOR && docker rm express-app-$NEW_COLOR"
   exit 1
 fi
 
 # Step 7: Update NGINX to point to the new environment
-ssh $SERVER "sudo sed -i 's/$CURRENT_PORT/$NEW_PORT/' /etc/nginx/sites-available/express-app && sudo nginx -s reload"
+ssh $SERVER "sudo sed -i '/proxy_pass/s/$CURRENT_PORT/$NEW_PORT/' /etc/nginx/sites-available/express-app && sudo nginx -s reload"
 if [ $? -ne 0 ]; then
   echo "Error: Failed to update NGINX configuration."
   exit 1
