@@ -1,14 +1,12 @@
-version: '3.9'
-
 services:
   mariadb:
     image: mariadb:latest
     container_name: mariadb
     environment:
-      MYSQL_ROOT_PASSWORD: your_root_password
-      MYSQL_DATABASE: your_database_name
-      MYSQL_USER: your_user
-      MYSQL_PASSWORD: your_user_password
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
     volumes:
       - mariadb_data:/var/lib/mysql
     networks:
@@ -17,21 +15,20 @@ services:
     build:
       context: .
       dockerfile: dockerfile.dev
+      args:
+        NODE_ENV: ${NODE_ENV}
+        DATABASE_URL: ${DATABASE_URL}
     container_name: express-app
     depends_on:
       - mariadb
-    env_file:
-      - .env.local
     ports:
       - "3000:3000" # Map the app's port 3000 to the host
     volumes:
-      - ./src:/usr/src/app # Bind mount source code for hot-reloading
-      - /usr/src/app/node_modules # Prevent overwriting node_modules
+      - ./src:/usr/src/app/src
+      - /usr/src/app/node_modules
     command: npm run dev # Use a development command, such as nodemon
     networks:
       - dev_network
-
-
 
 networks:
   dev_network:
