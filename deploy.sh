@@ -46,7 +46,7 @@ echo "Stopping and removing any existing container for $NEW_COLOR..."
 ssh $SERVER "docker stop express-app-$NEW_COLOR && docker rm express-app-$NEW_COLOR" || true
 
 # Step 5: Deploy the new container on the remote server
-ssh $SERVER "docker run --platform linux/arm64 -d --name express-app-$NEW_COLOR -p $NEW_PORT:3000 $IMAGE_NAME"
+ssh $SERVER "docker run --platform linux/arm64 -d --restart always --name express-app-$NEW_COLOR -p $NEW_PORT:3000 $IMAGE_NAME"
 if [ $? -ne 0 ]; then
   echo "Error: Failed to start the new container on the remote server."
   exit 1

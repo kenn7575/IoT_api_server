@@ -1,0 +1,88 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Room {
+  id          Int       @id @default(autoincrement())
+  name        String    @db.VarChar(100)
+  description String?   @db.VarChar(255)
+  devices     Device[]
+  alerts      Alert[]
+  measurements Measurement[]
+}
+
+model Setting {
+  id                 Int       @id @default(autoincrement())
+  name               String    @db.VarChar(100)
+  timeIntervalSeconds Int
+  startTime          DateTime  @db.Time
+  endTime            DateTime  @db.Time
+  createdAt          DateTime  @default(now())
+  updatedAt          DateTime  @updatedAt
+  devices            Device[]
+}
+
+model Device {
+  id          Int       @id @default(autoincrement())
+  name        String    @db.VarChar(100)
+  description String?   @db.VarChar(255)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  roomId      Int?
+  room        Room?     @relation(fields: [roomId], references: [id], onDelete: Cascade)
+  settingId   Int?
+  setting     Setting?  @relation(fields: [settingId], references: [id], onDelete: SetNull)
+  apiKeys     ApiKey[]
+  measurements Measurement[]
+  alerts      Alert[]
+}
+
+model ApiKey {
+  id       Int      @id @default(autoincrement())
+  name     String   @db.VarChar(100)
+  key      String   @db.VarChar(100)
+  deviceId Int
+  device   Device   @relation(fields: [deviceId], references: [id], onDelete: Cascade)
+}
+
+model Measurement {
+  id              Int      @id @default(autoincrement())
+  createdAt       DateTime @default(now())
+  measurement     Int
+  valueType       String?  @db.VarChar(100)
+  measurementType MeasurementType
+  deviceId        Int
+  roomId          Int
+  device          Device   @relation(fields: [deviceId], references: [id], onDelete: Cascade)
+  room            Room     @relation(fields: [roomId], references: [id], onDelete: Cascade)
+}
+
+model Alert {
+  id          Int      @id @default(autoincrement())
+  name        String   @db.VarChar(100)
+  description String?  @db.VarChar(100)
+  createdAt   DateTime @default(now())
+  roomId      Int
+  deviceId    Int
+  room        Room     @relation(fields: [roomId], references: [id], onDelete: Cascade)
+  device      Device   @relation(fields: [deviceId], references: [id], onDelete: Cascade)
+}
+
+enum MeasurementType {
+  Temperature
+  Humidity
+  Pressure
+  Light
+  Other
+}
