@@ -21,6 +21,8 @@ services:
     container_name: express-app
     depends_on:
       - mariadb
+    expose:
+      - 3000
     ports:
       - "3000:3000" # Map the app's port 3000 to the host
     volumes:
