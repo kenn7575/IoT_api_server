@@ -56,6 +56,7 @@ model ApiKey {
   key      String   @db.VarChar(100)
   deviceId Int
   device   Device   @relation(fields: [deviceId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
 }
 
 model Measurement {
