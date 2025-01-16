@@ -30,7 +30,7 @@ export async function deviceLoginController(
 
   const device = await prisma.device.findUnique({
     where: {
-      machine_id,
+      machine_id: machine_id,
     },
   });
 
@@ -40,7 +40,7 @@ export async function deviceLoginController(
 
   await prisma.device.update({
     where: {
-      machine_id,
+      machine_id: machine_id,
     },
     data: {
       updatedAt: new Date(),

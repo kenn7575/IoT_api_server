@@ -9,6 +9,8 @@ services:
       MYSQL_PASSWORD: ${MYSQL_PASSWORD}
     volumes:
       - mariadb_data:/var/lib/mysql
+    ports:
+      -  "3307:3306"
     networks:
       - dev_network
   express-app:
