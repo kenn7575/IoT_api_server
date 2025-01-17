@@ -5,13 +5,13 @@ import { getHumidityMeasurements, createHumidityMeasurement } from "../controlle
 
 const router = Router();
 
-router.get("/temperature-measurement", getTemperatureMeasurements);
-router.post("/temperature-measurement", createTemperatureMeasurement);
+router.get("/get-temperature-measurement", getTemperatureMeasurements);
+router.post("/post-temperature-measurement", createTemperatureMeasurement);
 
-router.get("/noise-measurement", getNoiseMeasurements);
-router.post("/noise-measurement", createNoiseMeasurement);
+router.get("/get-noise-measurement", getNoiseMeasurements);
+router.post("/post-noise-measurement", createNoiseMeasurement);
 
-router.get("/humidity-measurement", getHumidityMeasurements);
-router.post("/humidity-measurement", createHumidityMeasurement);
+router.get("/get-humidity-measurement", getHumidityMeasurements);
+router.post("/post-humidity-measurement", createHumidityMeasurement);
 
 export default router;
