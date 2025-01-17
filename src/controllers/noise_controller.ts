@@ -18,7 +18,7 @@ export async function getNoiseMeasurements(
   try {
     const measurements = await prisma.measurement.findMany({
       where: {
-        measurementType: "Noise"
+        sensorType: "Noise"
       }
     });
     return res.json(measurements);
@@ -44,7 +44,7 @@ export async function createNoiseMeasurement(
       data: {
         measurement,
         valueType,
-        measurementType: "Noise",
+        sensorType: "Noise",
         deviceId,
         roomId,
       },

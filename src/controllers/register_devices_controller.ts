@@ -34,6 +34,7 @@ export async function registerDevice(
         roomId,
         settingId,
         active,
+        updatedAt: new Date(),
       },
     });
     return res.status(201).json(newDevice);

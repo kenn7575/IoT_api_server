@@ -18,7 +18,7 @@ export async function getHumidityMeasurements(
   try {
     const measurements = await prisma.measurement.findMany({
       where: {
-        measurementType: "Humidity"
+        sensorType: "Humidity"
       }
     });
     return res.json(measurements);
@@ -44,7 +44,7 @@ export async function createHumidityMeasurement(
       data: {
         measurement,
         valueType,
-        measurementType: "Humidity",
+        sensorType: "Humidity",
         deviceId,
         roomId,
       },

@@ -18,7 +18,7 @@ export async function getTemperatureMeasurements(
   try {
     const measurements = await prisma.measurement.findMany({
       where: {
-        measurementType: "Temperature"
+        sensorType: "Temperature"
       }
     });
     return res.json(measurements);
@@ -44,7 +44,7 @@ export async function createTemperatureMeasurement(
       data: {
         measurement,
         valueType,
-        measurementType: "Temperature",
+        sensorType: "Temperature",
         deviceId,
         roomId,
       },

@@ -49,7 +49,7 @@ export async function deviceLoginController(
   });
 
   const apiKey: string = crypto.randomUUID();
-  await prisma.apiKey.create({
+  await prisma.apikey.create({
     data: {
       key: apiKey,
       deviceId: device.id,
