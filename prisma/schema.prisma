@@ -8,12 +8,12 @@ datasource db {
 }
 
 model alert {
-  id          Int      @id @unique(map: "id_UNIQUE") @default(autoincrement())
+  id          Int      @id @unique(map: "id_UNIQUE") @default(autoincrement()) @db.UnsignedInt
   name        String   @db.VarChar(100)
   description String?  @db.VarChar(100)
   createdAt   DateTime @default(now())
-  roomId      Int
-  deviceId    Int
+  roomId      Int      @db.UnsignedInt
+  deviceId    Int      @db.UnsignedInt
   device      device   @relation(fields: [deviceId], references: [id], onDelete: Cascade, map: "Alert_deviceId_fkey")
   room        room     @relation(fields: [roomId], references: [id], onDelete: Cascade, map: "Alert_roomId_fkey")
 
@@ -22,10 +22,10 @@ model alert {
 }
 
 model apikey {
-  id        Int      @id @unique(map: "id_UNIQUE") @default(autoincrement())
+  id        Int      @id @unique(map: "id_UNIQUE") @default(autoincrement()) @db.UnsignedInt
   name      String   @db.VarChar(100)
   key       String   @db.VarChar(100)
-  deviceId  Int
+  deviceId  Int      @db.UnsignedInt
   createdAt DateTime @default(now())
   device    device   @relation(fields: [deviceId], references: [id], onDelete: Cascade, map: "ApiKey_deviceId_fkey")
 
@@ -33,42 +33,43 @@ model apikey {
 }
 
 model device {
-  id          Int           @id @unique(map: "id_UNIQUE") @default(autoincrement())
-  name        String        @db.VarChar(100)
-  description String?       @db.VarChar(255)
-  createdAt   DateTime      @default(now())
-  updatedAt   DateTime
-  roomId      Int?
-  settingId   Int?
-  active      Boolean       @default(true)
-  machine_id  String        @unique(map: "machine_id_UNIQUE") @db.VarChar(100)
-  alert       alert[]
-  apikey      apikey[]
-  room        room?         @relation(fields: [roomId], references: [id], onDelete: Cascade, map: "Device_roomId_fkey")
-  setting     setting?      @relation(fields: [settingId], references: [id], map: "Device_settingId_fkey")
-  measurement measurement[]
+  id             Int              @id @unique(map: "id_UNIQUE") @default(autoincrement()) @db.UnsignedInt
+  name           String           @db.VarChar(100)
+  description    String?          @db.VarChar(255)
+  createdAt      DateTime         @default(now())
+  updatedAt      DateTime
+  roomId         Int?             @db.UnsignedInt
+  settingId      Int?             @db.UnsignedInt
+  active         Boolean          @default(true)
+  machine_id     String           @unique(map: "machine_id_UNIQUE") @db.VarChar(100)
+  alert          alert[]
+  apikey         apikey[]
+  room           room?            @relation(fields: [roomId], references: [id], onDelete: Cascade, map: "Device_roomId_fkey")
+  setting        setting?         @relation(fields: [settingId], references: [id], map: "Device_settingId_fkey")
+  measurement    measurement[]
+  sensorsettings sensorsettings[]
 
   @@index([roomId], map: "Device_roomId_fkey")
   @@index([settingId], map: "Device_settingId_fkey")
 }
 
 model measurement {
-  id              Int                         @id @unique(map: "id_UNIQUE") @default(autoincrement())
-  createdAt       DateTime                    @default(now())
-  measurement     Int
-  valueType       String?                     @db.VarChar(100)
-  measurementType measurement_measurementType
-  deviceId        Int
-  roomId          Int
-  device          device                      @relation(fields: [deviceId], references: [id], onDelete: Cascade, map: "Measurement_deviceId_fkey")
-  room            room                        @relation(fields: [roomId], references: [id], onDelete: Cascade, map: "Measurement_roomId_fkey")
+  id          Int                     @id @unique(map: "id_UNIQUE") @default(autoincrement()) @db.UnsignedInt
+  createdAt   DateTime                @default(now())
+  measurement Int
+  valueType   String?                 @db.VarChar(100)
+  deviceId    Int                     @db.UnsignedInt
+  roomId      Int                     @db.UnsignedInt
+  sensorType  measurement_sensorType?
+  device      device                  @relation(fields: [deviceId], references: [id], onDelete: Cascade, map: "Measurement_deviceId_fkey")
+  room        room                    @relation(fields: [roomId], references: [id], onDelete: Cascade, map: "Measurement_roomId_fkey")
 
   @@index([deviceId], map: "Measurement_deviceId_fkey")
   @@index([roomId], map: "Measurement_roomId_fkey")
 }
 
 model room {
-  id          Int           @id @unique(map: "id_UNIQUE") @default(autoincrement())
+  id          Int           @id @unique(map: "id_UNIQUE") @default(autoincrement()) @db.UnsignedInt
   name        String        @db.VarChar(100)
   description String?       @db.VarChar(255)
   alert       alert[]
@@ -77,14 +78,22 @@ model room {
 }
 
 model sensorsettings {
-  id                 Int @id @unique(map: "Id_UNIQUE")
-  temperaturInterval Int
-  humidityInterval   Int
-  noiseInterval      Int
+  id                   Int                          @id @unique(map: "Id_UNIQUE") @db.UnsignedInt
+  createdAt            DateTime                     @default(now())
+  updatedAt            DateTime                     @default(now())
+  sensorType           sensorsettings_sensorType
+  maxValue             Float                        @db.Float
+  minValue             Float                        @db.Float
+  timeinterval_seconds Int                          @db.UnsignedInt
+  active_period        sensorsettings_active_period
+  deviceId             Int                          @db.UnsignedInt
+  device               device                       @relation(fields: [deviceId], references: [id], onUpdate: Restrict, map: "sensorsettings_ibfk_1")
+
+  @@index([deviceId], map: "deviceId")
 }
 
 model setting {
-  id                  Int      @id @unique(map: "id_UNIQUE") @default(autoincrement())
+  id                  Int      @id @unique(map: "id_UNIQUE") @default(autoincrement()) @db.UnsignedInt
   name                String   @db.VarChar(100)
   timeIntervalSeconds Int
   startTime           DateTime @db.Time(0)
@@ -94,11 +103,25 @@ model setting {
   device              device[]
 }
 
-enum measurement_measurementType {
+enum sensorsettings_sensorType {
   Temperature
   Humidity
   Noise
   Pressure
   Light
   Other
+}
+
+enum measurement_sensorType {
+  Temperature
+  Humidity
+  Noise
+  Pressure
+  Light
+  Other
+}
+
+enum sensorsettings_active_period {
+  Open
+  Closed
 }
