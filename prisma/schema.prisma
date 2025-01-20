@@ -77,7 +77,7 @@ model room {
   measurement measurement[]
 }
 
-model sensorsettings {
+model sensorSettings {
   id                   Int                          @id @unique(map: "Id_UNIQUE") @db.UnsignedInt
   createdAt            DateTime                     @default(now())
   updatedAt            DateTime                     @default(now())
@@ -86,7 +86,7 @@ model sensorsettings {
   minValue             Float                        @db.Float
   timeinterval_seconds Int                          @db.UnsignedInt
   active_period        sensorsettings_active_period
-  deviceId             Int                          @db.UnsignedInt
+  deviceId             Int                          @db.UnsignedInt @unique(map: "sensorsettings_deviceId_unique")
   device               device                       @relation(fields: [deviceId], references: [id], onUpdate: Restrict, map: "sensorsettings_ibfk_1")
 
   @@index([deviceId], map: "deviceId")
