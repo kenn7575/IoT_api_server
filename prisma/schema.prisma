@@ -47,7 +47,7 @@ model device {
   room           room?            @relation(fields: [roomId], references: [id], onDelete: Cascade, map: "Device_roomId_fkey")
   setting        setting?         @relation(fields: [settingId], references: [id], map: "Device_settingId_fkey")
   measurement    measurement[]
-  sensorsettings sensorsettings[]
+  sensorSettings sensorSettings[]
 
   @@index([roomId], map: "Device_roomId_fkey")
   @@index([settingId], map: "Device_settingId_fkey")
@@ -81,11 +81,11 @@ model sensorSettings {
   id                   Int                          @id @unique(map: "Id_UNIQUE") @db.UnsignedInt
   createdAt            DateTime                     @default(now())
   updatedAt            DateTime                     @default(now())
-  sensorType           sensorsettings_sensorType
+  sensorType           sensor_settings_sensor_type
   maxValue             Float                        @db.Float
   minValue             Float                        @db.Float
   timeinterval_seconds Int                          @db.UnsignedInt
-  active_period        sensorsettings_active_period
+  active_period        sensor_settings_active_period
   deviceId             Int                          @db.UnsignedInt @unique(map: "sensorsettings_deviceId_unique")
   device               device                       @relation(fields: [deviceId], references: [id], onUpdate: Restrict, map: "sensorsettings_ibfk_1")
 
@@ -103,7 +103,7 @@ model setting {
   device              device[]
 }
 
-enum sensorsettings_sensorType {
+enum sensor_settings_sensor_type {
   Temperature
   Humidity
   Noise
@@ -121,7 +121,7 @@ enum measurement_sensorType {
   Other
 }
 
-enum sensorsettings_active_period {
+enum sensor_settings_active_period {
   Open
   Closed
 }
