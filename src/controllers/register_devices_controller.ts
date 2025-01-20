@@ -5,8 +5,8 @@ import { z } from "zod";
 const prisma = new PrismaClient();
 
 const deviceSchema = z.object({
-  machine_id: z.string().max(100),
-  name: z.string().max(100),
+  machine_id: z.string().min(1).max(100),
+  name: z.string().min(1).max(100),
   description: z.string().max(255).optional(),
   roomId: z.number().int().optional(),
   settingId: z.number().int().optional(),
