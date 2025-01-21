@@ -43,6 +43,7 @@ export async function getSettings(
       },
     },
   });
+  console.log("🚀 ~ deviceData:", deviceData);
   console.log("deviceData", deviceData);
 
   if (!deviceData) {

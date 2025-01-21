@@ -1,14 +1,14 @@
 import { Request, Response } from "express";
 import { PrismaClient } from "@prisma/client";
 import { z } from "zod";
+import { numberString } from "../../utils/schemas";
 
 const prisma = new PrismaClient();
 
 const humidityMeasurementSchema = z.object({
-  measurement: z.number(),
+  measurement: numberString,
   valueType: z.string().optional(),
   machine_id: z.string(),
-  roomId: z.number().int(),
 });
 
 export async function getHumidityMeasurements(
@@ -18,12 +18,14 @@ export async function getHumidityMeasurements(
   try {
     const measurements = await prisma.measurement.findMany({
       where: {
-        sensorType: "Humidity"
-      }
+        sensorType: "Humidity",
+      },
     });
     return res.json(measurements);
   } catch (error) {
-    return res.status(500).json({ error: "An error occurred while fetching humidity measurements" });
+    return res.status(500).json({
+      error: "An error occurred while fetching humidity measurements",
+    });
   }
 }
 
@@ -37,7 +39,7 @@ export async function createHumidityMeasurement(
     return res.status(400).json({ error: validationResult.error.errors });
   }
 
-  const { measurement, valueType, machine_id, roomId } = validationResult.data;
+  const { measurement, valueType, machine_id } = validationResult.data;
 
   try {
     const device = await prisma.device.findUnique({
@@ -54,11 +56,13 @@ export async function createHumidityMeasurement(
         valueType,
         sensorType: "Humidity",
         deviceId: device.id,
-        roomId,
+        roomId: device.roomId,
       },
     });
     return res.status(201).json(newMeasurement);
   } catch (error) {
-    return res.status(500).json({ error: "An error occurred while saving the humidity measurement" });
+    return res.status(500).json({
+      error: "An error occurred while saving the humidity measurement",
+    });
   }
 }

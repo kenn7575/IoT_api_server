@@ -5,12 +5,29 @@ import { z } from "zod";
 const prisma = new PrismaClient();
 
 const temperatureMeasurementSchema = z.object({
-  measurement: z.number().int(),
-  valueType: z.string().max(100).optional(),
-  machine_id: z.string(),
-  roomId: z.number().int(),
+  measurement: z
+    .union([z.number(), z.string()])
+    .refine(
+      (value) => {
+        if (typeof value === "string") {
+          const parsed = parseFloat(value);
+          return !isNaN(parsed) && Number.isInteger(parsed);
+        }
+        return Number.isInteger(value);
+      },
+      { message: "Id must be an integer or a valid integer string" }
+    )
+    .transform((value) =>
+      typeof value === "string" ? parseInt(value, 10) : value
+    ),
+  value_type: z.string().max(100).optional(),
+  machine_id: z
+    .string()
+    .min(1, { message: "machine_id is required" })
+    .max(100, { message: "machine_id too long. Max 100 char" }),
 });
-
+import { measurement_sensorType } from "@prisma/client";
+import { numberString } from "../../utils/schemas";
 export async function getTemperatureMeasurements(
   req: Request,
   res: Response
@@ -18,16 +35,14 @@ export async function getTemperatureMeasurements(
   try {
     const measurements = await prisma.measurement.findMany({
       where: {
-        sensorType: "Temperature",
+        sensorType: "Temperature" /* measurement_sensorType.Temperature */,
       },
     });
     return res.json(measurements);
   } catch (error) {
-    return res
-      .status(500)
-      .json({
-        error: "An error occurred while fetching temperature measurements",
-      });
+    return res.status(500).json({
+      error: "An error occurred while fetching temperature measurements",
+    });
   }
 }
 
@@ -36,16 +51,16 @@ export async function createTemperatureMeasurement(
   res: Response
 ): Promise<void | any> {
   const validationResult = temperatureMeasurementSchema.safeParse(req.body);
-
+  console.log("validationResult", validationResult);
   if (!validationResult.success) {
-    return res.status(400).json({ error: validationResult.error.errors });
+    return res.status(400).json({ error: validationResult.error.flatten() });
   }
 
-  const { measurement, valueType, machine_id, roomId } = validationResult.data;
+  const { measurement, value_type, machine_id } = validationResult.data;
 
   try {
     const device = await prisma.device.findUnique({
-      where: { machine_id },
+      where: { machine_id: machine_id.trim() },
     });
 
     if (!device) {
@@ -55,18 +70,17 @@ export async function createTemperatureMeasurement(
     const newMeasurement = await prisma.measurement.create({
       data: {
         measurement,
-        valueType,
-        sensorType: "Temperature",
+        valueType: value_type,
+        sensorType: "Temperature" /* measurement_sensorType.Temperature */,
         deviceId: device.id,
-        roomId,
+        roomId: device.roomId,
       },
     });
     return res.status(201).json(newMeasurement);
   } catch (error) {
-    return res
-      .status(500)
-      .json({
-        error: "An error occurred while saving the temperature measurement",
-      });
+    console.error(error);
+    return res.status(500).json({
+      error: "An error occurred while saving the temperature measurement",
+    });
   }
 }

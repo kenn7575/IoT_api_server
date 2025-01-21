@@ -38,13 +38,13 @@ model device {
   description    String?         @db.VarChar(255)
   createdAt      DateTime        @default(now())
   updatedAt      DateTime         @default(now()) 
-  roomId         Int?            @db.UnsignedInt
-  settingId      Int           @db.UnsignedInt @unique
+  roomId         Int            @db.UnsignedInt
+  settingId      Int            @db.UnsignedInt @unique
   active         Boolean         @default(true)
   machine_id     String          @unique @db.VarChar(100)
   alert          alert[]
   apikey         apikey[]
-  room           room?           @relation(fields: [roomId], references: [id], onDelete: Cascade, map: "Device_roomId_fkey")
+  room           room           @relation(fields: [roomId], references: [id], onDelete: Cascade, map: "Device_roomId_fkey")
   setting        setting        @relation(fields: [settingId], references: [id])
   measurement    measurement[]
   sensorSettings sensorSettings?
