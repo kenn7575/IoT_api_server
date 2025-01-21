@@ -5,9 +5,9 @@ import { z } from "zod";
 const prisma = new PrismaClient();
 
 const humidityMeasurementSchema = z.object({
-  measurement: z.number().int(),
-  valueType: z.string().max(100).optional(),
-  deviceId: z.number().int(),
+  measurement: z.number(),
+  valueType: z.string().optional(),
+  machine_id: z.string(),
   roomId: z.number().int(),
 });
 
@@ -37,15 +37,23 @@ export async function createHumidityMeasurement(
     return res.status(400).json({ error: validationResult.error.errors });
   }
 
-  const { measurement, valueType, deviceId, roomId } = validationResult.data;
+  const { measurement, valueType, machine_id, roomId } = validationResult.data;
 
   try {
+    const device = await prisma.device.findUnique({
+      where: { machine_id },
+    });
+
+    if (!device) {
+      return res.status(404).json({ error: "Device not found" });
+    }
+
     const newMeasurement = await prisma.measurement.create({
       data: {
         measurement,
         valueType,
         sensorType: "Humidity",
-        deviceId,
+        deviceId: device.id,
         roomId,
       },
     });
