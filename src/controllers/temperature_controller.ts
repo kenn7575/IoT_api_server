@@ -7,7 +7,7 @@ const prisma = new PrismaClient();
 const temperatureMeasurementSchema = z.object({
   measurement: z.number().int(),
   valueType: z.string().max(100).optional(),
-  machine_id: z.number().int(),
+  machine_id: z.string(),
   roomId: z.number().int(),
 });
 
@@ -45,7 +45,7 @@ export async function createTemperatureMeasurement(
 
   try {
     const device = await prisma.device.findUnique({
-      where: { id: machine_id },
+      where: { machine_id },
     });
 
     if (!device) {
