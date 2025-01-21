@@ -18,12 +18,16 @@ export async function getTemperatureMeasurements(
   try {
     const measurements = await prisma.measurement.findMany({
       where: {
-        sensorType: "Temperature"
-      }
+        sensorType: "Temperature",
+      },
     });
     return res.json(measurements);
   } catch (error) {
-    return res.status(500).json({ error: "An error occurred while fetching temperature measurements" });
+    return res
+      .status(500)
+      .json({
+        error: "An error occurred while fetching temperature measurements",
+      });
   }
 }
 
@@ -51,6 +55,10 @@ export async function createTemperatureMeasurement(
     });
     return res.status(201).json(newMeasurement);
   } catch (error) {
-    return res.status(500).json({ error: "An error occurred while saving the temperature measurement" });
+    return res
+      .status(500)
+      .json({
+        error: "An error occurred while saving the temperature measurement",
+      });
   }
 }

@@ -8,10 +8,11 @@ BLUE_PORT=3002
 GREEN_PORT=3001
 IMAGE_NAME="express-app:new" # Name of the Docker image to create and deploy
 LOCAL_BUILD_DIR="." # Directory containing the Dockerfile (e.g., current directory)
+DATABASE_URL="mysql://root:nogetJegKanHuske@localhost:3307/IoT_dev"
 
 # Step 1: Build the Docker image locally
 echo "Building Docker image: $IMAGE_NAME"
-docker buildx build --platform linux/arm64 -t $IMAGE_NAME $LOCAL_BUILD_DIR
+docker buildx build --platform linux/arm64 --secret id=DATABASE_URL,env=$DATABASE_URL  -t $IMAGE_NAME $LOCAL_BUILD_DIR 
 
 if [ $? -ne 0 ]; then
   echo "Error: Failed to build the Docker image."

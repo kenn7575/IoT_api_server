@@ -7,10 +7,15 @@ const prisma = new PrismaClient();
 const deviceSchema = z.object({
   machine_id: z.string().min(1).max(100),
   name: z.string().min(1).max(100),
-  description: z.string().max(255).optional(),
-  roomId: z.number().int().optional(),
-  settingId: z.number().int().optional(),
-  active: z.boolean().default(true),
+  description: z.string().min(1).max(255).optional(),
+  roomId: z.number().int(),
+  active: z.boolean().optional(),
+  settings: z.object({
+    name: z.string().min(1).max(100),
+    timeIntervalSeconds: z.number().int(),
+    startTime: z.string().optional(),
+    endTime: z.string().optional(),
+  }),
 });
 
 export async function registerDevice(
@@ -20,25 +25,38 @@ export async function registerDevice(
   const validationResult = deviceSchema.safeParse(req.body);
 
   if (!validationResult.success) {
-    return res.status(400).json({ error: validationResult.error.errors });
+    return res.status(400).json({ error: validationResult.error.flatten() });
   }
 
-  const { machine_id, name, description, roomId, settingId, active } = validationResult.data;
+  const data = req.body;
 
+  console.log(JSON.stringify(req.body));
   try {
-    const newDevice = await prisma.device.create({
+    const newSettingsAndDevice = await prisma.setting.create({
       data: {
-        machine_id,
-        name,
-        description,
-        roomId,
-        settingId,
-        active,
-        updatedAt: new Date(),
+        name: data.settings.name,
+        startTime: data.settings.startTime,
+        endTime: data.settings.endTime,
+        device: {
+          create: {
+            machine_id: data.machine_id.trim(),
+            name: data.name,
+            description: data.description,
+            roomId: data.roomId,
+            active: data.active,
+          },
+        },
+      },
+      include: {
+        device: true,
       },
     });
-    return res.status(201).json(newDevice);
+
+    return res.status(201).json(newSettingsAndDevice.device);
   } catch (error) {
-    return res.status(500).json({ error: "An error occurred while registering the device" });
+    console.error(error);
+    return res.status(500).json({
+      error: "An error occurred while registering the device" + error,
+    });
   }
 }

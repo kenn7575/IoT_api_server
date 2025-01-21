@@ -33,24 +33,23 @@ model apikey {
 }
 
 model device {
-  id             Int              @id @unique(map: "id_UNIQUE") @default(autoincrement()) @db.UnsignedInt
-  name           String           @db.VarChar(100)
-  description    String?          @db.VarChar(255)
-  createdAt      DateTime         @default(now())
-  updatedAt      DateTime
-  roomId         Int?             @db.UnsignedInt
-  settingId      Int?             @db.UnsignedInt
-  active         Boolean          @default(true)
-  machine_id     String           @unique(map: "machine_id_UNIQUE") @db.VarChar(100)
+  id             Int             @id @unique(map: "id_UNIQUE") @default(autoincrement()) @db.UnsignedInt
+  name           String          @db.VarChar(100)
+  description    String?         @db.VarChar(255)
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime         @default(now()) 
+  roomId         Int?            @db.UnsignedInt
+  settingId      Int           @db.UnsignedInt @unique
+  active         Boolean         @default(true)
+  machine_id     String          @unique @db.VarChar(100)
   alert          alert[]
   apikey         apikey[]
-  room           room?            @relation(fields: [roomId], references: [id], onDelete: Cascade, map: "Device_roomId_fkey")
-  setting        setting?         @relation(fields: [settingId], references: [id], map: "Device_settingId_fkey")
+  room           room?           @relation(fields: [roomId], references: [id], onDelete: Cascade, map: "Device_roomId_fkey")
+  setting        setting        @relation(fields: [settingId], references: [id])
   measurement    measurement[]
-  sensorSettings sensorSettings[]
+  sensorSettings sensorSettings?
 
   @@index([roomId], map: "Device_roomId_fkey")
-  @@index([settingId], map: "Device_settingId_fkey")
 }
 
 model measurement {
@@ -78,29 +77,29 @@ model room {
 }
 
 model sensorSettings {
-  id                   Int                          @id @unique(map: "Id_UNIQUE") @db.UnsignedInt
-  createdAt            DateTime                     @default(now())
-  updatedAt            DateTime                     @default(now())
+  id                   Int                           @id @unique(map: "Id_UNIQUE") @db.UnsignedInt
+  createdAt            DateTime                      @default(now())
+  updatedAt            DateTime                      @default(now())
   sensorType           sensor_settings_sensor_type
-  maxValue             Float                        @db.Float
-  minValue             Float                        @db.Float
-  timeinterval_seconds Int                          @db.UnsignedInt
-  active_period        sensor_settings_active_period
-  deviceId             Int                          @db.UnsignedInt @unique(map: "sensorsettings_deviceId_unique")
-  device               device                       @relation(fields: [deviceId], references: [id], onUpdate: Restrict, map: "sensorsettings_ibfk_1")
+  maxValue             Float                         @db.Float
+  minValue             Float                         @db.Float
+  timeinterval_seconds Int                           @default(300) @db.UnsignedInt
+  active_period        sensor_settings_active_period @default(Open)
+  deviceId             Int                           @unique(map: "sensorsettings_deviceId_unique") @db.UnsignedInt
+  device               device                        @relation(fields: [deviceId], references: [id], onUpdate: Restrict, map: "sensorsettings_ibfk_1")
 
   @@index([deviceId], map: "deviceId")
 }
 
 model setting {
-  id                  Int      @id @unique(map: "id_UNIQUE") @default(autoincrement()) @db.UnsignedInt
-  name                String   @db.VarChar(100)
-  timeIntervalSeconds Int
-  startTime           DateTime @db.Time(0)
-  endTime             DateTime @db.Time(0)
-  createdAt           DateTime @default(now())
-  updatedAt           DateTime
-  device              device[]
+  id        Int      @id @unique(map: "id_UNIQUE") @default(autoincrement()) @db.UnsignedInt
+  name      String   @default("Default") @db.VarChar(100)
+  startTime DateTime @default(dbgenerated("('08:00:00')")) @db.Time(0)
+  endTime   DateTime @default(dbgenerated("('16:00:00')")) @db.Time(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now())
+
+  device device?
 }
 
 enum sensor_settings_sensor_type {

@@ -9,9 +9,14 @@ ENV DATABASE_URL=$DATABASE_URL
 ENV NODE_ENV=$NODE_ENV
 
 COPY package*.json  ./
-RUN npm install
 
-COPY . .
+COPY ./src .
+
+COPY ./prisma .
+
+COPY ./tsconfig.json .
+
+COPY ./nodemon.json .
 
 RUN npm install
 

@@ -20,16 +20,16 @@ export async function getSettings(
     return res.status(400).json(result.error.flatten());
   }
 
-  const deviceData = await prisma.device.findUnique({
-    where: {
-      machine_id: machine_id,
-    },
+  console.log("machine id", machine_id);
+  console.log("machine id", machine_id.length);
+
+  const deviceData = await prisma.device.findFirst({
+    where: { machine_id: machine_id.trim() },
     include: {
       setting: {
         select: {
           endTime: true,
           startTime: true,
-          timeIntervalSeconds: true,
         },
       },
       sensorSettings: {
@@ -43,6 +43,7 @@ export async function getSettings(
       },
     },
   });
+  console.log("deviceData", deviceData);
 
   if (!deviceData) {
     return res.status(404).json({ message: "Device not found" });

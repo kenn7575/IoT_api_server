@@ -28,25 +28,15 @@ export async function deviceLoginController(
 
   const { machine_id } = result.data;
 
-  const device = await prisma.device.findUnique({
+  const device = await prisma.device.findFirst({
     where: {
-      machine_id: machine_id,
+      machine_id: machine_id.trim(),
     },
   });
 
   if (!device) {
     return res.status(401).json({ message: "device not found" });
   }
-
-  await prisma.device.update({
-    where: {
-      machine_id: machine_id,
-    },
-    data: {
-      updatedAt: new Date(),
-      machine_id: machine_id,
-    },
-  });
 
   const apiKey: string = crypto.randomUUID();
   await prisma.apikey.create({

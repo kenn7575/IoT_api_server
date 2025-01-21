@@ -18,12 +18,14 @@ export async function getNoiseMeasurements(
   try {
     const measurements = await prisma.measurement.findMany({
       where: {
-        sensorType: "Noise"
-      }
+        sensorType: "Noise",
+      },
     });
     return res.json(measurements);
   } catch (error) {
-    return res.status(500).json({ error: "An error occurred while fetching noise measurements" });
+    return res
+      .status(500)
+      .json({ error: "An error occurred while fetching noise measurements" });
   }
 }
 
@@ -51,6 +53,8 @@ export async function createNoiseMeasurement(
     });
     return res.status(201).json(newMeasurement);
   } catch (error) {
-    return res.status(500).json({ error: "An error occurred while saving the noise measurement" });
+    return res
+      .status(500)
+      .json({ error: "An error occurred while saving the noise measurement" });
   }
 }

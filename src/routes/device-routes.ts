@@ -6,7 +6,7 @@ import { updateSensorSettings } from "../controllers/update_settings_controller"
 
 const router = express.Router();
 
-router.post("/:machine_id", registerDevice); //register new device
+router.post("/", registerDevice); //register new device
 router.post("/login", deviceLoginController); //login device and return API key
 
 router.get("/:machine_id/settings", getSettings); //register new device

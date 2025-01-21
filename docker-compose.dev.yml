@@ -1,42 +1,39 @@
+name: iotapi
 services:
   mariadb:
     image: mariadb:latest
     container_name: mariadb
-    environment:
-      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
-      MYSQL_DATABASE: ${MYSQL_DATABASE}
-      MYSQL_USER: ${MYSQL_USER}
-      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+    env_file:
+      - local.env
+    # environment:
+    #   MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+    #   MYSQL_DATABASE: ${MYSQL_DATABASE}
+    #   MYSQL_USER: ${MYSQL_USER}
+    #   MYSQL_PASSWORD: ${MYSQL_PASSWORD}
     volumes:
       - mariadb_data:/var/lib/mysql
     ports:
-      -  "3307:3306"
-    networks:
-      - dev_network
+      - "3307:3306"
+
   express-app:
     build:
       context: .
       dockerfile: dockerfile.dev
-      args:
-        NODE_ENV: ${NODE_ENV}
-        DATABASE_URL: ${DATABASE_URL}
+      # args:
+      #   NODE_ENV: ${NODE_ENV}
+      #   DATABASE_URL: ${DATABASE_URL}
     container_name: express-app
     depends_on:
       - mariadb
     expose:
       - 3000
+    env_file:
+      - local.env
     ports:
       - "3000:3000" # Map the app's port 3000 to the host
     volumes:
       - ./src:/usr/src/app/src
-      - /usr/src/app/node_modules
     command: npm run dev # Use a development command, such as nodemon
-    networks:
-      - dev_network
-
-networks:
-  dev_network:
-    driver: bridge
 
 volumes:
   mariadb_data:
