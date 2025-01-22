@@ -5,21 +5,7 @@ import { z } from "zod";
 const prisma = new PrismaClient();
 
 const temperatureMeasurementSchema = z.object({
-  measurement: z
-    .union([z.number(), z.string()])
-    .refine(
-      (value) => {
-        if (typeof value === "string") {
-          const parsed = parseFloat(value);
-          return !isNaN(parsed) && Number.isInteger(parsed);
-        }
-        return Number.isInteger(value);
-      },
-      { message: "Id must be an integer or a valid integer string" }
-    )
-    .transform((value) =>
-      typeof value === "string" ? parseInt(value, 10) : value
-    ),
+  measurement: z.coerce.number(),
   value_type: z.string().max(100).optional(),
   machine_id: z
     .string()

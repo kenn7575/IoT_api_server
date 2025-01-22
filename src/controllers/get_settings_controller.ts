@@ -32,17 +32,10 @@ export async function getSettings(
           startTime: true,
         },
       },
-      sensorSettings: {
-        select: {
-          active_period: true,
-          maxValue: true,
-          minValue: true,
-          sensorType: true,
-          timeinterval_seconds: true,
-        },
-      },
+      sensorSettings: true,
     },
   });
+  // deviceData?.sensorSettings.
   console.log("🚀 ~ deviceData:", deviceData);
   console.log("deviceData", deviceData);
 
@@ -52,8 +45,17 @@ export async function getSettings(
 
   const returnData = {
     sensorSettings: deviceData.sensorSettings, // list of sensor settings
-    settings: deviceData.setting, // device settings
+    settings: { startTime: "", endTime: "" }, // device settings
   };
+  returnData.settings.startTime = deviceData.setting.startTime
+    .toISOString()
+    .split("T")[1]
+    .split(".")[0];
+
+  returnData.settings.endTime = deviceData.setting.endTime
+    .toISOString()
+    .split("T")[1]
+    .split(".")[0];
 
   return res.status(200).json(returnData);
 }
