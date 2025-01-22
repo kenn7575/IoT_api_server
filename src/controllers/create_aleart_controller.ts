@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
-import { PrismaClient } from "@prisma/client";
+import { PrismaClient, SensorType } from "@prisma/client";
 import { z } from "zod";
+// Assuming SensorType is an enum in your Prisma schema
 
 const deviceLoginSchema = z.object({
   name: z
@@ -11,6 +12,7 @@ const deviceLoginSchema = z.object({
     .string()
     .min(1, { message: "Description must be at least 1 character" })
     .max(100, { message: "Max length is 100 characters" }),
+  sensorType: z.nativeEnum(SensorType),
 });
 
 const prisma = new PrismaClient();
@@ -32,6 +34,7 @@ export async function createAleartController(
       deviceId: device.id,
       description: result.data.description,
       roomId: device.roomId,
+      sensorType: "Temperature",
     },
   });
 

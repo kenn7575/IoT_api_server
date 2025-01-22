@@ -24,7 +24,7 @@ export async function getSettings(
   console.log("machine id", machine_id.length);
 
   const deviceData = await prisma.device.findFirst({
-    where: { machine_id: machine_id.trim() },
+    where: { machineId: machine_id.trim() },
     include: {
       setting: {
         select: {
@@ -45,17 +45,8 @@ export async function getSettings(
 
   const returnData = {
     sensorSettings: deviceData.sensorSettings, // list of sensor settings
-    settings: { startTime: "", endTime: "" }, // device settings
+    settings: deviceData.setting, // device settings
   };
-  returnData.settings.startTime = deviceData.setting.startTime
-    .toISOString()
-    .split("T")[1]
-    .split(".")[0];
-
-  returnData.settings.endTime = deviceData.setting.endTime
-    .toISOString()
-    .split("T")[1]
-    .split(".")[0];
 
   return res.status(200).json(returnData);
 }

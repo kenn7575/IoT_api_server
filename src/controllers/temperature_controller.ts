@@ -4,15 +4,13 @@ import { z } from "zod";
 
 const prisma = new PrismaClient();
 
+import { SensorType } from "@prisma/client";
+
 const temperatureMeasurementSchema = z.object({
   measurement: z.coerce.number(),
   value_type: z.string().max(100).optional(),
-  machine_id: z
-    .string()
-    .min(1, { message: "machine_id is required" })
-    .max(100, { message: "machine_id too long. Max 100 char" }),
+  sensor_type: z.enum(Object.keys(SensorType) as [keyof typeof SensorType]),
 });
-import { measurement_sensorType } from "@prisma/client";
 import { numberString } from "../../utils/schemas";
 export async function getTemperatureMeasurements(
   req: Request,
@@ -36,28 +34,20 @@ export async function createTemperatureMeasurement(
   req: Request,
   res: Response
 ): Promise<void | any> {
-  const validationResult = temperatureMeasurementSchema.safeParse(req.body);
-  console.log("validationResult", validationResult);
-  if (!validationResult.success) {
-    return res.status(400).json({ error: validationResult.error.flatten() });
+  const device = res.locals.device;
+
+  const result = temperatureMeasurementSchema.safeParse(req.body);
+  if (!result.success) {
+    return res.status(400).json({ error: result.error.flatten().fieldErrors });
   }
 
-  const { measurement, value_type, machine_id } = validationResult.data;
-
+  const data = result.data;
   try {
-    const device = await prisma.device.findUnique({
-      where: { machine_id: machine_id.trim() },
-    });
-
-    if (!device) {
-      return res.status(404).json({ error: "Device not found" });
-    }
-
     const newMeasurement = await prisma.measurement.create({
       data: {
-        measurement,
-        valueType: value_type,
-        sensorType: "Temperature" /* measurement_sensorType.Temperature */,
+        measurement: data.measurement,
+        valueType: data.value_type,
+        sensorType: SensorType.Temperature,
         deviceId: device.id,
         roomId: device.roomId,
       },

@@ -13,8 +13,8 @@ const deviceSchema = z.object({
   settings: z.object({
     name: z.string().min(1).max(100),
     timeIntervalSeconds: z.number().int(),
-    startTime: z.string().optional(),
-    endTime: z.string().optional(),
+    startTime: z.string().min(1).max(16).optional(),
+    endTime: z.string().min(1).max(16).optional(),
   }),
 });
 
@@ -28,10 +28,16 @@ export async function registerDevice(
     return res.status(400).json({ error: validationResult.error.flatten() });
   }
 
-  const data = req.body;
+  const data = validationResult.data;
 
-  console.log(JSON.stringify(req.body));
   try {
+    const room = await prisma.room.findUnique({
+      where: { id: data.roomId },
+    });
+    if (!room) {
+      return res.status(404).json({ error: "Room not found" });
+    }
+
     const newSettingsAndDevice = await prisma.setting.create({
       data: {
         name: data.settings.name,
@@ -39,7 +45,7 @@ export async function registerDevice(
         endTime: data.settings.endTime,
         device: {
           create: {
-            machine_id: data.machine_id.trim(),
+            machineId: data.machine_id.trim(),
             name: data.name,
             description: data.description,
             roomId: data.roomId,

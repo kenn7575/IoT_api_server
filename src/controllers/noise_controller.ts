@@ -33,6 +33,8 @@ export async function createNoiseMeasurement(
   req: Request,
   res: Response
 ): Promise<void | any> {
+  const device = res.locals.device;
+
   const validationResult = noiseMeasurementSchema.safeParse(req.body);
 
   if (!validationResult.success) {
@@ -42,10 +44,6 @@ export async function createNoiseMeasurement(
   const { measurement, valueType, machine_id, roomId } = validationResult.data;
 
   try {
-    const device = await prisma.device.findUnique({
-      where: { machine_id },
-    });
-
     if (!device) {
       return res.status(404).json({ error: "Device not found" });
     }

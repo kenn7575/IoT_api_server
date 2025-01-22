@@ -5,8 +5,8 @@ import { z } from "zod";
 const prisma = new PrismaClient();
 const apiKeySchema = z.object({
   apiKey: z
-    .string({ message: "Api key is required" })
-    .min(1, { message: "Api key must be at least 1 in length" }),
+    .string({ message: "api_key is required" })
+    .min(1, { message: "api_key must be at least 1 in length" }),
 });
 
 export const authMiddleware = async (
@@ -21,21 +21,21 @@ export const authMiddleware = async (
     return;
   }
 
-  const device = await prisma.device.findFirst({
+  const data = await prisma.apiKey.findFirst({
     where: {
-      apikey: {
-        some: {
-          key: result.data.apiKey,
-        },
-      },
+      apiKey: "7b464d5f-42d5-4485-bb55-e69a20b0c30d",
+    },
+    include: {
+      device: true,
     },
   });
+  console.log("Data:", data);
 
-  if (!device) {
+  if (!data) {
     res.status(401).json({ error: "Invalid API key" });
     return;
   }
 
-  res.locals.device = device;
+  res.locals.device = data.device;
   next();
 };
