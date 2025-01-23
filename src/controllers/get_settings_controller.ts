@@ -30,6 +30,7 @@ export async function getSettings(
         select: {
           endTime: true,
           startTime: true,
+          updateSettingsIntervalSeconds: true,
         },
       },
       sensorSettings: true,

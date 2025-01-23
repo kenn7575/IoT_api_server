@@ -40,11 +40,11 @@ export async function deviceLoginController(
 
   const apiKey: string = crypto.randomUUID();
   // delete old api keys and create a new one
-  await prisma.apiKey.deleteMany({
-    where: {
-      deviceId: device.id,
-    },
-  });
+  // await prisma.apiKey.deleteMany({
+  //   where: {
+  //     deviceId: device.id,
+  //   },
+  // });
 
   await prisma.apiKey.create({
     data: {

@@ -3,6 +3,6 @@ import { createAleartController } from "../controllers/create_aleart_controller"
 
 const router = express.Router();
 
-router.post("/", createAleartController); //get all
+router.post("/", createAleartController);
 
 export default router;

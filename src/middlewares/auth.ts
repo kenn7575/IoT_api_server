@@ -23,13 +23,12 @@ export const authMiddleware = async (
 
   const data = await prisma.apiKey.findFirst({
     where: {
-      apiKey: "7b464d5f-42d5-4485-bb55-e69a20b0c30d",
+      apiKey: result.data.apiKey,
     },
     include: {
       device: true,
     },
   });
-  console.log("Data:", data);
 
   if (!data) {
     res.status(401).json({ error: "Invalid API key" });

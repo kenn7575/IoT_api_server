@@ -13,6 +13,7 @@ const deviceLoginSchema = z.object({
     .min(1, { message: "Description must be at least 1 character" })
     .max(100, { message: "Max length is 100 characters" }),
   sensorType: z.nativeEnum(SensorType),
+  measurementId: z.coerce.number(),
 });
 
 const prisma = new PrismaClient();
@@ -34,7 +35,8 @@ export async function createAleartController(
       deviceId: device.id,
       description: result.data.description,
       roomId: device.roomId,
-      sensorType: "Temperature",
+      sensorType: result.data.sensorType,
+      MeasurementId: result.data.measurementId,
     },
   });
 

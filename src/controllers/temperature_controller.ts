@@ -8,10 +8,9 @@ import { SensorType } from "@prisma/client";
 
 const temperatureMeasurementSchema = z.object({
   measurement: z.coerce.number(),
-  value_type: z.string().max(100).optional(),
-  sensor_type: z.enum(Object.keys(SensorType) as [keyof typeof SensorType]),
+  value_type: z.string().max(100),
 });
-import { numberString } from "../../utils/schemas";
+
 export async function getTemperatureMeasurements(
   req: Request,
   res: Response

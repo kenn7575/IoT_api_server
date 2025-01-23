@@ -5,10 +5,8 @@ import { z } from "zod";
 const prisma = new PrismaClient();
 
 const noiseMeasurementSchema = z.object({
-  measurement: z.number().int(),
-  valueType: z.string().max(100).optional(),
-  machine_id: z.string(),
-  roomId: z.number().int(),
+  measurement: z.coerce.number(),
+  valueType: z.string(),
 });
 
 export async function getNoiseMeasurements(
@@ -34,14 +32,17 @@ export async function createNoiseMeasurement(
   res: Response
 ): Promise<void | any> {
   const device = res.locals.device;
+  console.log("🚀 ~ device:", device);
 
   const validationResult = noiseMeasurementSchema.safeParse(req.body);
 
   if (!validationResult.success) {
-    return res.status(400).json({ error: validationResult.error.errors });
+    return res
+      .status(400)
+      .json({ error: validationResult.error.flatten().fieldErrors });
   }
 
-  const { measurement, valueType, machine_id, roomId } = validationResult.data;
+  const { measurement, valueType } = validationResult.data;
 
   try {
     if (!device) {
@@ -54,7 +55,7 @@ export async function createNoiseMeasurement(
         valueType,
         sensorType: "Noise",
         deviceId: device.id,
-        roomId,
+        roomId: device.roomId,
       },
     });
     return res.status(201).json(newMeasurement);

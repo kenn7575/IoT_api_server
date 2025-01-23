@@ -8,18 +8,21 @@ datasource db {
 }
 
 model Alert {
-  id          Int        @id @default(autoincrement()) @db.UnsignedInt
-  name        String     @db.VarChar(100)
-  description String?    @db.VarChar(100)
-  createdAt   DateTime   @default(now())
-  roomId      Int        @db.UnsignedInt
-  deviceId    Int        @db.UnsignedInt
-  sensorType  SensorType
-  device      Device     @relation(fields: [deviceId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  room        Room       @relation(fields: [roomId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  id            Int         @id @default(autoincrement()) @db.UnsignedInt
+  name          String      @db.VarChar(100)
+  description   String?     @db.VarChar(100)
+  createdAt     DateTime    @default(now())
+  roomId        Int         @db.UnsignedInt
+  deviceId      Int         @db.UnsignedInt
+  sensorType    SensorType
+  MeasurementId Int         @default(1) @db.UnsignedInt
+  device        Device      @relation(fields: [deviceId], references: [id], onDelete: Cascade)
+  Measurement   Measurement @relation(fields: [MeasurementId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "Alert_measurementId_fkey")
+  room          Room        @relation(fields: [roomId], references: [id], onDelete: Cascade)
 
   @@index([deviceId])
   @@index([roomId])
+  @@index([MeasurementId], map: "Alert_measurementId_fkey_idx")
 }
 
 model ApiKey {
@@ -28,7 +31,7 @@ model ApiKey {
   apiKey    String   @db.VarChar(100)
   deviceId  Int      @db.UnsignedInt
   createdAt DateTime @default(now())
-  device    Device   @relation(fields: [deviceId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  device    Device   @relation(fields: [deviceId], references: [id], onDelete: Cascade)
 
   @@index([deviceId])
 }
@@ -45,7 +48,7 @@ model Device {
   machineId      String           @unique @db.VarChar(100)
   alerts         Alert[]
   apiKeys        ApiKey[]
-  room           Room             @relation(fields: [roomId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  room           Room             @relation(fields: [roomId], references: [id], onDelete: Cascade)
   setting        Setting          @relation(fields: [settingId], references: [id])
   measurements   Measurement[]
   sensorSettings SensorSettings[]
@@ -61,44 +64,46 @@ model Measurement {
   deviceId    Int        @db.UnsignedInt
   roomId      Int        @db.UnsignedInt
   sensorType  SensorType
-  device      Device     @relation(fields: [deviceId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  room        Room       @relation(fields: [roomId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  Alert       Alert[]
+  device      Device     @relation(fields: [deviceId], references: [id], onDelete: Cascade)
+  room        Room       @relation(fields: [roomId], references: [id], onDelete: Cascade)
 
   @@index([deviceId])
   @@index([roomId])
 }
 
 model Room {
-  id          Int           @id @default(autoincrement()) @db.UnsignedInt
-  name        String        @db.VarChar(100)
-  description String?       @db.VarChar(255)
-  alerts      Alert[]
-  devices     Device[]
+  id           Int           @id @default(autoincrement()) @db.UnsignedInt
+  name         String        @db.VarChar(100)
+  description  String?       @db.VarChar(255)
+  alerts       Alert[]
+  devices      Device[]
   measurements Measurement[]
 }
 
 model SensorSettings {
-  id                   Int                   @id @default(autoincrement()) @db.UnsignedInt
-  createdAt            DateTime              @default(now())
-  updatedAt            DateTime              @default(now()) @updatedAt
-  sensorType           SensorType
-  maxValue             Float                 @db.Float
-  minValue             Float                 @db.Float
-  timeIntervalSeconds  Int                   @default(300) @db.UnsignedInt
-  activePeriod         SensorSettingsPeriod  @default(Open)
-  deviceId             Int                   @db.UnsignedInt
-  device               Device                @relation(fields: [deviceId], references: [id], onUpdate: Restrict)
+  id                  Int                  @id @default(autoincrement()) @db.UnsignedInt
+  createdAt           DateTime             @default(now())
+  updatedAt           DateTime             @default(now()) @updatedAt
+  sensorType          SensorType
+  maxValue            Float                @db.Float
+  minValue            Float                @db.Float
+  timeIntervalSeconds Int                  @default(300) @db.UnsignedInt
+  activePeriod        SensorSettingsPeriod @default(Open)
+  deviceId            Int                  @db.UnsignedInt
+  device              Device               @relation(fields: [deviceId], references: [id], onUpdate: Restrict)
 
   @@index([deviceId])
 }
 
 model Setting {
-  id        Int      @id @default(autoincrement()) @db.UnsignedInt
-  name      String   @default("Default") @db.VarChar(100)
-  startTime String   @default("08:00:00") @db.VarChar(16)
-  endTime   String   @default("16:00:00") @db.VarChar(16)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @default(now()) @updatedAt
+  id        Int                     @id @default(autoincrement()) @db.UnsignedInt
+  name      String                  @default("Default") @db.VarChar(100)
+  startTime String                  @default("08:00:00") @db.VarChar(16)
+  endTime   String                  @default("16:00:00") @db.VarChar(16)
+  createdAt DateTime                @default(now())
+  updateSettingsIntervalSeconds Int @default(300) @db.UnsignedInt
+  updatedAt DateTime                @default(now()) @updatedAt
   device    Device?
 }
 
