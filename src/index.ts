@@ -5,6 +5,7 @@ import devicesRoutes from "./routes/device-routes";
 import measurementRoutes from "./routes/measurement_routes";
 import alertRoutes from "./routes/alert_routes";
 import roomRoutes from "./routes/room_routes";
+import sensorSettingsRoutes from "./routes/sensor_settings_routes";
 import bodyParser from "body-parser";
 import { authMiddleware } from "./middlewares/auth";
 
@@ -19,6 +20,7 @@ app.use("/test", testRoutes);
 app.use("/devices", devicesRoutes);
 app.use("/measurements", authMiddleware, measurementRoutes);
 app.use("/alerts", authMiddleware, alertRoutes);
+app.use("/sensors", authMiddleware, sensorSettingsRoutes);
 app.use("/rooms", authMiddleware, roomRoutes);
 
 app.listen(port, () => {
