@@ -8,7 +8,7 @@ const router = Router();
 
 router.post("/", createSensorSettings);
 router.get("/settings/:machine_id", getSensorSettings);
-router.put("/settings/:sensorSettingsId", updateSensorSettings);
+router.patch("/settings/:sensorSettingsId", updateSensorSettings);
 router.delete("/settings/:sensorSettingsId", deleteSensorSettings);
 
 export default router;
