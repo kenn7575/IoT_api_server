@@ -1,8 +1,8 @@
 import express from "express";
-import { deviceLoginController } from "../controllers/device_login_controller";
-import { registerDevice } from "../controllers/register_devices_controller";
+import { deviceLoginController } from "../controllers/device/device_login_controller";
+import { registerDevice } from "../controllers/device/register_devices_controller";
 import { updateDeviceInfo } from "../controllers/device/update_device_info_controller";
-import { getSettings } from "../controllers/get_settings_controller";
+import { getSettings } from "../controllers/device/get_settings_controller";
 import { updateSettingsController } from "../controllers/settings/update_settings_controller";
 import { authMiddleware } from "../middlewares/auth";
 

@@ -8,7 +8,7 @@ import { SensorType } from "@prisma/client";
 
 const temperatureMeasurementSchema = z.object({
   measurement: z.coerce.number(),
-  value_type: z.string().max(100),
+  valueType: z.string().max(100),
 });
 
 export async function getTemperatureMeasurements(
@@ -45,7 +45,7 @@ export async function createTemperatureMeasurement(
     const newMeasurement = await prisma.measurement.create({
       data: {
         measurement: data.measurement,
-        valueType: data.value_type,
+        valueType: data.valueType,
         sensorType: SensorType.Temperature,
         deviceId: device.id,
         roomId: device.roomId,

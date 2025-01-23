@@ -2,15 +2,15 @@ import { Router } from "express";
 import {
   getTemperatureMeasurements,
   createTemperatureMeasurement,
-} from "../controllers/temperature_controller";
+} from "../controllers/measurements/temperature_controller";
 import {
   getNoiseMeasurements,
   createNoiseMeasurement,
-} from "../controllers/noise_controller";
+} from "../controllers/measurements/noise_controller";
 import {
   getHumidityMeasurements,
   createHumidityMeasurement,
-} from "../controllers/humidity_controller";
+} from "../controllers/measurements/humidity_controller";
 
 const router = Router();
 

@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import { PrismaClient, SensorType } from "@prisma/client";
 import { z } from "zod";
-import { numberString } from "../../utils/schemas";
+import { numberString } from "../../../utils/schemas";
 
 const prisma = new PrismaClient();
 
