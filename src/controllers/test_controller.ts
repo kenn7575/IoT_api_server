@@ -11,3 +11,12 @@ export async function testApi(
 
   return res.send("connection successful");
 }
+
+export async function versionApi(
+  req: Request,
+  res: Response
+): Promise<void | any> {
+  //   const tables = await prisma.table_name.findMany();
+
+  return res.send("Version 1.0.0");
+}

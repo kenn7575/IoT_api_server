@@ -4,7 +4,8 @@
     "start": "node dist/index.js",
     "dev": "nodemon ./src/index.ts -L --host",
     "deploy": "bash -x deploy.sh",
-    "docker-dev": "docker compose -f docker-compose.dev.yml --env-file ./local.env up -d --build "
+    "docker-dev": "docker compose -f docker-compose.dev.yml --env-file ./local.env up -d --build ",
+    "test": "bash -x test.sh"
   },
   "dependencies": {
     "body-parser": "^1.20.3",
