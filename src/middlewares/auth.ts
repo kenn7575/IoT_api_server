@@ -14,8 +14,11 @@ export const authMiddleware = async (
   res: Response,
   next: NextFunction
 ): Promise<void> => {
-  const apiKey = req.headers["api_key"];
+  const apiKey = req.headers["api-key"];
+  console.log("🚀 ~ req.headers:", req.headers);
+  console.log("🚀 ~ apiKey:", apiKey);
   const result = apiKeySchema.safeParse({ apiKey: apiKey });
+  console.log("🚀 ~ result:", result);
   if (!result.success) {
     res.status(400).json(result.error.flatten().fieldErrors);
     return;
@@ -23,12 +26,13 @@ export const authMiddleware = async (
 
   const data = await prisma.apiKey.findFirst({
     where: {
-      apiKey: result.data.apiKey,
+      apiKey: result.data.apiKey.trim(),
     },
     include: {
       device: true,
     },
   });
+  console.log("🚀 ~ data:", data);
 
   if (!data) {
     res.status(401).json({ error: "Invalid API key" });

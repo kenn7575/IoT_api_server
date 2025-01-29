@@ -1,10 +1,14 @@
 import { Request, Response } from "express";
-import { PrismaClient } from "@prisma/client";
+import {
+  Prisma,
+  PrismaClient,
+  sensorsettings_sensorType,
+} from "@prisma/client";
 import { z } from "zod";
 
 const prisma = new PrismaClient();
 
-import { SensorType } from "@prisma/client";
+import { alert_sensorType } from "@prisma/client";
 
 const temperatureMeasurementSchema = z.object({
   measurement: z.coerce.number(),
@@ -46,7 +50,7 @@ export async function createTemperatureMeasurement(
       data: {
         measurement: data.measurement,
         valueType: data.valueType,
-        sensorType: SensorType.Temperature,
+        sensorType: alert_sensorType.Temperature,
         deviceId: device.id,
         roomId: device.roomId,
       },

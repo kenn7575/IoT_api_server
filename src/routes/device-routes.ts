@@ -12,7 +12,14 @@ router.post("/", registerDevice); //register new device
 router.post("/login", deviceLoginController); //login device and return API key
 router.patch("/:machine_id", authMiddleware, updateDeviceInfo); //update device info
 
-router.get("/:machine_id/settings", authMiddleware, getSettings); //register new device
+router.get(
+  "/:machine_id/settings",
+  () => {
+    console.log("Why am i running?");
+  },
+  authMiddleware,
+  getSettings
+); //register new device
 router.patch("/:machine_id/settings", authMiddleware, updateSettingsController);
 
 export default router;
